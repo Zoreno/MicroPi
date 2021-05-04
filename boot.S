@@ -3,37 +3,37 @@
  
 .org 0x7000
 __start_lower:
-	// Shut off extra cores
-	mrc p15, 0, r5, c0, c0, 5
-	and r5, r5, #3
-	cmp r5, #0
-	bne halt
+    // Shut off extra cores
+    mrc p15, 0, r5, c0, c0, 5
+    and r5, r5, #3
+    cmp r5, #0
+    bne halt
  
-	// Setup the stack.
-	ldr r5, =_start
-	mov sp, r5
+    // Setup the stack.
+    ldr r5, =_start
+    mov sp, r5
  
 clear_bss:
-	ldr r4, =__bss_start
-	ldr r9, =__bss_end
-	mov r5, #0
-	mov r6, #0
-	mov r7, #0
-	mov r8, #0
+    ldr r4, =__bss_start
+    ldr r9, =__bss_end
+    mov r5, #0
+    mov r6, #0
+    mov r7, #0
+    mov r8, #0
  
 clear_bss_loop:
-	cmp r4, r9
-	bhs _done          // Check if we are past bss
-	stmia r4!, {r5-r8} // store multiple at r4.
+    cmp r4, r9
+    bhs _done          // Check if we are past bss
+    stmia r4!, {r5-r8} // store multiple at r4.
     bl clear_bss_loop
 
 _done:
-	ldr r3, =kernel_main // Call kernel_main
-	blx r3
+    ldr r3, =kernel_main // Call kernel_main
+    blx r3
  
 halt:
-	wfe
-	b halt
+    wfe
+    b halt
 
 .globl _start
  
