@@ -4,8 +4,8 @@ SECTIONS
 {
     /DISCARD/ :
     {
-        *(.text)
-        *(.got*)
+        *(.text) /* Each function text section is put in a separate section, so we can discard this generic one */
+        *(.got*) /* GOT is not used (-fno-plt -fno-pic) */
     }
 
     . = 0x8000;
@@ -16,14 +16,7 @@ SECTIONS
         KEEP(*(.text.boot))
     }
     __text_end = .;
- 
-    __rodata_start = .;
-    .rodata :
-    {
-        *(.rodata)
-    }
-    __rodata_end = .;
- 
+
     __data_start = .;
     .data :
     {
@@ -38,6 +31,5 @@ SECTIONS
         *(.bss)
     }
     __bss_end = .;
-    __bss_size = __bss_end - __bss_start;
     __end = .;
 }
