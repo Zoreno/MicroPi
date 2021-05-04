@@ -3,7 +3,7 @@ typedef int int32_t;
 typedef unsigned int size_t;
 
 // Memory-Mapped I/O output
-static inline void mmio_write(uint32_t reg, uint32_t data)
+static inline void mmio_write(uint32_t reg, uint32_t data) 
 {
 	*(volatile uint32_t*)(reg) = data;
 }
@@ -50,7 +50,7 @@ enum
 
 };
  
-void uart_init()
+void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
 {
     // Configure GPIO
 	mmio_write(UART0_CR, 0x00000000); // Disable UART0.	
@@ -65,24 +65,11 @@ void uart_init()
 	mmio_write(UART0_LCRH, (1 << 4) | (1 << 5) | (1 << 6)); 	// Enable FIFO & 8 bit data transmission (1 stop bit, no parity).
 	mmio_write(UART0_IMSC, (1 << 1) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9) | (1 << 10)); // Mask all interrupts.
 	mmio_write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9)); // Enable UART0, receive & transfer part of UART.
-}
- 
-void uart_putc(unsigned char c)
-{
-	// Wait for UART to become ready to transmit.
-	while ( mmio_read(UART0_FR) & (1 << 5) );
-	mmio_write(UART0_DR, c);
-}
 
-void uart_puts(const char* str)
-{
-	for (size_t i = 0; str[i] != '\0'; i ++)
-		uart_putc((unsigned char)str[i]);
-}
+    const char *str = "Hello World!";
 
-void kernel_main(uint32_t r0, uint32_t r1, uint32_t atags)
-{
-	// initialize UART for Raspi2
-	uart_init(2);
-	uart_puts("Hello World!");
+    for (size_t i = 0; str[i] != '\0'; i ++) {
+	    while ( mmio_read(UART0_FR) & (1 << 5)); // Wait for UART to become ready to transmit.
+	    mmio_write(UART0_DR, (unsigned char) str[i]);
+    }
 }
